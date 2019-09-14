@@ -6,7 +6,8 @@ import {
   RECEIVE_USER_LIST,
   ERROR_USER_LIST,
   RECEIVE_MSG,
-  RECEIVE_MSG_LIST
+  RECEIVE_MSG_LIST,
+  READ_MSG
 } from "./action-types";
 import {
   reqRegister,
@@ -14,7 +15,8 @@ import {
   reqGetUser,
   reqUpdate,
   reqUserList,
-  reqChatMsgList
+  reqChatMsgList,
+  reqReadMsg
 } from "../api/ajax";
 
 const io = require("socket.io-client");
@@ -36,12 +38,25 @@ const receiveMsg = (chatMsg, userid) => ({
   type: RECEIVE_MSG,
   data: { chatMsg, userid }
 });
+const receiveReadMsg = data => ({ type: READ_MSG, data });
+export const readMsg = function(data) {
+  const { from, to } = data;
+
+  return async dispatch => {
+    let result = await reqReadMsg(data);
+    console.log("result", result, "from", from, "to", to);
+    if (result.code === 0) {
+      dispatch(receiveReadMsg({ from: from, to: to, number: result.data }));
+    }
+  };
+};
 export const sendMsg = data => {
   return dispatch => {
     console.log(data);
     io.socket.emit("clientMsg", data);
   };
 };
+
 async function getMsgList(dispatch, userid) {
   initIO(dispatch, userid);
   const result = await reqChatMsgList();

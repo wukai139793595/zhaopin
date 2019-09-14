@@ -7,7 +7,8 @@ import {
   RECEIVE_USER_LIST,
   ERROR_USER_LIST,
   RECEIVE_MSG_LIST,
-  RECEIVE_MSG
+  RECEIVE_MSG,
+  READ_MSG
 } from "./action-types.jsx";
 import { getDirectTo } from "../utils/index.jsx";
 
@@ -46,6 +47,16 @@ const initChat = {
   chatMsgs: [], // 当前用户所有相关msg的数组
   unReadCount: 0 // 总的未读数量
 };
+function getReadCount(chatMsgs, to) {
+  let unReadCount = 0;
+
+  chatMsgs.forEach((item, index) => {
+    if (item.to === to && !item.read) {
+      unReadCount++;
+    }
+  });
+  return unReadCount;
+}
 function chat(state = initChat, action) {
   switch (action.type) {
     case RECEIVE_MSG_LIST:
@@ -53,14 +64,31 @@ function chat(state = initChat, action) {
       return {
         users,
         chatMsgs,
-        unReadCount: 0
+        unReadCount: getReadCount(chatMsgs, userid)
       };
     case RECEIVE_MSG:
       const { chatMsg } = action.data;
       return {
         users: state.users,
         chatMsgs: [...state.chatMsgs, chatMsg],
-        unReadCount: 0
+        unReadCount: getReadCount(
+          [...state.chatMsgs, chatMsg],
+          action.data.userid
+        )
+      };
+    case READ_MSG:
+      const { from, to, number } = action.data;
+      console.log("number", number);
+      return {
+        users: state.users,
+        chatMsgs: state.chatMsgs.map((item, index) => {
+          if (item.from === from && item.to === to && !item.read) {
+            return { ...item, read: true };
+          } else {
+            return { ...item };
+          }
+        }),
+        unReadCount: state.unReadCount - number
       };
     default:
       return state;

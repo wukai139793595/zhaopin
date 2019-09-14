@@ -20,15 +20,30 @@ export const getDirectTo = function(user) {
 
   return path;
 };
+
 export const filterLastMsgs = function(chatMsgs, userid) {
   let lastObj = {};
   chatMsgs.forEach((item, index) => {
     if (item.from === userid || item.to === userid) {
       if (!lastObj[item.chat_id]) {
-        lastObj[item.chat_id] = item;
+        lastObj[item.chat_id] = { ...item };
+        if (item.to === userid && !item.read) {
+          lastObj[item.chat_id].unReadCount = 1;
+        } else {
+          lastObj[item.chat_id].unReadCount = 0;
+        }
       } else {
+        let tempCount = lastObj[item.chat_id].unReadCount;
         if (lastObj[item.chat_id].create_time < item.create_time) {
-          lastObj[item.chat_id] = item;
+          if (item.to === userid && !item.read) {
+            lastObj[item.chat_id] = { ...item, unReadCount: tempCount + 1 };
+          } else {
+            lastObj[item.chat_id] = { ...item, unReadCount: tempCount };
+          }
+        } else {
+          if (item.to === userid && !item.read) {
+            lastObj[item.chat_id].unReadCount += 1;
+          }
         }
       }
     }

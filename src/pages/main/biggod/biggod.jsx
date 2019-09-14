@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
+
 import { getUserList } from "../../../redux/actions.jsx";
 import UserList from "../../../components/user-list/user-list";
 

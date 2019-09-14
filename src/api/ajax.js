@@ -38,4 +38,5 @@ export const reqUpdate = (data) => ajax('/update', data, 'POST');
 export const reqUserList = (data) => ajax('/userlist', data, 'POST');
 // 
 export const reqChatMsgList = (data) => ajax('/msglist', data);
-// 
+// 更新已读消息
+export const reqReadMsg = (data) => ajax('/readmsg', data);

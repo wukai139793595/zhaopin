@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { TabBar } from "antd-mobile";
 import { withRouter } from "react-router-dom";
+import { connect } from "react-redux";
 
 import "./nav-footer.less";
 
@@ -12,6 +13,7 @@ class NavFooter extends Component {
     let tabList = this.props.tabList.filter((item, index) => {
       return !item.hide;
     });
+    const { unReadCount } = this.props.chat;
     return (
       <TabBar tabBarPosition="bottom">
         {tabList.map((item, index) => {
@@ -21,6 +23,7 @@ class NavFooter extends Component {
               selectedIcon={{
                 uri: require(`../../assets/nav${item.key}-selected.png`)
               }}
+              badge={item.key === "/message" ? unReadCount : 0}
               title={item.title}
               selected={this.props.history.location.pathname === item.key}
               key={item.key}
@@ -33,4 +36,4 @@ class NavFooter extends Component {
   }
 }
 
-export default withRouter(NavFooter);
+export default connect(state => ({ chat: state.chat }))(withRouter(NavFooter));
